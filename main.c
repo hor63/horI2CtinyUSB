@@ -18,9 +18,9 @@ int main(void)
 	usbInit();
 
 	// Set pin 02 as output pin. All other pins remain input pins.
-	DDRB = (1<<DDB2);
+	DDRB = _BV(DDB2);
 	// Switch the pull-ups of the input pins on. Switch pin 02 off.
-	PORTB = ~(1<<PB2);
+	PORTB = ~ _BV(PB2);
 
 
     while (1)
