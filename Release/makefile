@@ -32,14 +32,18 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 LSS += \
 horI2CtinyUSB.lss \
+horI2CtinyUSB.lss \
 
 FLASH_IMAGE += \
+horI2CtinyUSB.hex \
 horI2CtinyUSB.hex \
 
 EEPROM_IMAGE += \
 horI2CtinyUSB.eep \
+horI2CtinyUSB.eep \
 
 SIZEDUMMY += \
+sizedummy \
 sizedummy \
 
 
