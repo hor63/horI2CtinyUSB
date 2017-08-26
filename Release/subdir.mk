@@ -17,7 +17,7 @@ C_DEPS += \
 %.o: ../%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: AVR Compiler'
-	avr-gcc -I"/home/openvario/openvario/system/horOpenVario/src/horI2CtinyUSB/config" -I"/home/openvario/openvario/system/horOpenVario/src/horI2CtinyUSB/v-usb/usbdrv" -Wall -gstabs -Os -fpack-struct -fshort-enums -ffunction-sections -fdata-sections -std=gnu99 -funsigned-char -funsigned-bitfields -mmcu=attiny45 -DF_CPU=12000000UL -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	avr-gcc -I"/home/openvario/openvario/system/horOpenVario/src/horI2CtinyUSB/config" -I"/home/openvario/openvario/system/horOpenVario/src/horI2CtinyUSB/v-usb/usbdrv" -Wall -O2 -std=gnu99 -mmcu=attiny45 -DF_CPU=12000000UL -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
