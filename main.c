@@ -158,7 +158,7 @@ static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL,
 #endif
 
 /* ------------------------------------------------------------------------- */
-#define DEFAULT_DELAY 10  // default 10us (100khz)
+#define DEFAULT_DELAY 2  // default 10us (100khz)
 static unsigned short clock_delay  = DEFAULT_DELAY;
 static unsigned short clock_delay2 = DEFAULT_DELAY/2;
 
@@ -182,10 +182,10 @@ static unsigned char saved_cmd;
 static void i2c_io_set_sda(uchar hi) {
   if(hi) {
     I2C_DDR  &= ~I2C_SDA;    // high -> input
-    I2C_PORT |=  I2C_SDA;    // with pullup
+    //I2C_PORT |=  I2C_SDA;    // with pullup
   } else {
     I2C_DDR  |=  I2C_SDA;    // low -> output
-    I2C_PORT &= ~I2C_SDA;    // drive low
+    //I2C_PORT &= ~I2C_SDA;    // drive low
   }
 }
 
@@ -198,13 +198,13 @@ static void i2c_io_set_scl(uchar hi) {
   _delay_loop_2(clock_delay2);
   if(hi) {
     I2C_DDR &= ~I2C_SCL;          // port is input
-    I2C_PORT |= I2C_SCL;          // enable pullup
+    //I2C_PORT |= I2C_SCL;          // enable pullup
 
     // wait while pin is pulled low by client
     while(!(I2C_PIN & I2C_SCL));
   } else {
     I2C_DDR |= I2C_SCL;           // port is output
-    I2C_PORT &= ~I2C_SCL;         // drive it low
+    //I2C_PORT &= ~I2C_SCL;         // drive it low
   }
   _delay_loop_2(clock_delay);
 #else
@@ -218,10 +218,12 @@ static void i2c_io_set_scl(uchar hi) {
 static void i2c_init(void) {
   /* init the sda/scl pins */
   I2C_DDR &= ~I2C_SDA;            // port is input
-  I2C_PORT |= I2C_SDA;            // enable pullup
+  //I2C_PORT |= I2C_SDA;            // enable pullup
+  I2C_PORT &= ~I2C_SDA;           // drive low when pin is switched as output
 #ifdef ENABLE_SCL_EXPAND
   I2C_DDR &= ~I2C_SCL;            // port is input
-  I2C_PORT |= I2C_SCL;            // enable pullup
+  //I2C_PORT |= I2C_SCL;            // enable pullup
+  I2C_PORT &= ~I2C_SCL;           // drive low when pin is switched as output
 #else
   I2C_DDR |= I2C_SCL;             // port is output
 #endif
@@ -368,7 +370,7 @@ static uchar i2c_do(struct i2c_cmd *cmd) {
 
   /* more data to be expected? */
 #ifndef USBTINY
-  return(cmd->len?0xff:0x00);
+  return(cmd->len?USB_NO_MSG:0x00);
 #else
   return(((cmd->flags & I2C_M_RD) && cmd->len)?0xff:0x00);
 #endif
@@ -496,12 +498,13 @@ extern	void	usb_out ( byte_t* data, byte_t len )
       len = expected;
     }
 
-    // consume bytes
+    // send bytes
     for(i=0;i<len;i++) {
       expected--;
       DEBUGF("data = %x\n", *data);
-      if(!i2c_put_u08(*data++))
-	err = 1;
+      if(!i2c_put_u08(*data++)){
+    	  err = 1;
+      }
     }
 
     // end transfer on last byte
@@ -510,7 +513,7 @@ extern	void	usb_out ( byte_t* data, byte_t len )
 
     if(err) {
       DEBUGF("write failed\n");
-      //TODO: set status
+	  return 0xff;
     }
 
   } else {
